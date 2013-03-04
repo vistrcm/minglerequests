@@ -7,6 +7,7 @@ import logging
 import os
 import getpass
 import ConfigParser
+from lxml import etree
 
 SERVER = 'http://mingle'
 API_PATH = '/api/'
@@ -25,20 +26,35 @@ logging.basicConfig(level=logging.DEBUG)
 class Card:
     """Representation of mingle card"""
 
-    def number():
-        doc = "The number property."
-
-        def fget(self):
-            return self._number
-
-        def fdel(self):
-            del self._number
-        return locals()
-    number = property(**number())
-
     def __init__(self, mingle, xml):
         # self._number = number
         self.migle = mingle
+        self.xml = etree.fromstring(xml)
+
+    def search(self, request):
+        """Search for field in card xml."""
+        result = self.xml.find(request)
+        logging.debug("xml search result = {}".format(result))
+        return result.text
+
+    def number(self):
+        """get card number."""
+        logging.debug("trying to search number")
+        result = self.search("number")
+        return result
+
+    def name(self):
+        """get card name."""
+        return self.search("name")
+
+    def __str__(self):
+        return "{number}: {name}".format(
+            number=self.number(),
+            name=self.name()
+        )
+
+    def pretty_xml(self):
+        return etree.tostring(self.xml)
 
 
 class Mingle(object):
@@ -81,7 +97,7 @@ class Mingle(object):
         logging.debug("GETting url {}".format(url))
         request = self._session.get(url)
 
-        return request
+        return Card(self, request.text)
 
 
 def get_cred():
@@ -139,7 +155,7 @@ def main():
     logging.debug("project is {}".format(mingle.project))
 
     card = mingle.card(889)
-    print(card.text)
+    print(card)
 
 if __name__ == "__main__":
     main()
