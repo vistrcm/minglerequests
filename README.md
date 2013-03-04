@@ -1,6 +1,6 @@
 mingle_requests
 ==============================
-lib to make requests to mingle
+lib to make api requests to mingle
 
 
 Requirements
