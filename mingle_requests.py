@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.DEBUG)
 # logging.basicConfig(level=logging.INFO)
 
 
-class Card:
+class Card(object):
     """Representation of mingle card"""
 
     def __init__(self, mingle, xml):
@@ -34,23 +34,24 @@ class Card:
     def search(self, request):
         """Search for field in card xml."""
         result = self.xml.find(request)
-        logging.debug("xml search result = {}".format(result))
         return result.text
 
+    @property
     def number(self):
         """get card number."""
         logging.debug("trying to search number")
         result = self.search("number")
         return result
 
+    @property
     def name(self):
         """get card name."""
         return self.search("name")
 
     def __str__(self):
         return "{number}: {name}".format(
-            number=self.number(),
-            name=self.name()
+            number=self.number,
+            name=self.name
         )
 
     def pretty_xml(self):
