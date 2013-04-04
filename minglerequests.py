@@ -90,23 +90,36 @@ class Mingle(object):
 
     project = property(**project())
 
-    def card(self, number):
-        """Return card."""
-        url = "{url}/cards/{number}.xml".format(
-            url=self.url,
-            number=number)
+    def card_by_url(self, url):
+        """Return card by url"""
 
         logging.debug("GETting url {}".format(url))
         request = self._session.get(url)
 
         return Card(self, request.text)
 
+    def card(self, number):
+        """Return card."""
+
+        url = "{url}/cards/{number}.xml".format(
+            url=self.url,
+            number=number)
+
+        return self.card_by_url(url)
+
     def create_story(self, name):
         """Create card"""
         url = "{url}/cards.xml".format(url=self.url)
 
         headers = {'content-type': 'application/x-www-form-urlencoded'}
-        payload = {'card[name]': name, 'card[card_type_name]': 'story'}
+        payload = {
+            'card[name]': name,
+            'card[card_type_name]': 'story',
+            'card[properties][1][name]': 'Author',
+            'card[properties][1][value]': 'svitko',
+            'card[properties][2][name]': 'Iteration - Scheduled',
+            'card[properties][2][value]': '(Current Iteration)',
+        }
 
         logging.debug("POSTing url {}".format(url))
         request = self._session.post(
@@ -114,7 +127,7 @@ class Mingle(object):
             data=urlencode(payload),
             headers=headers,
             auth=(self.user, self.password))
-
+        logging.debug("request data: {}".format(request.text))
         return request.headers['location']
 
 
@@ -148,9 +161,17 @@ def main():
     mingle.project = "devops"
     logging.debug("project is {}".format(mingle.project))
 
-    card = mingle.card(889)
-    print(card)
-    print(card.pretty_xml())
+    jira_id = 'WDSDO-3775'
+    jira_name = 'create document which describes DB pool service'
+
+    new_card_url = mingle.create_story("{jira_id} - {jira_name}".format(
+        jira_id=jira_id,
+        jira_name=jira_name))
+
+    testcard = mingle.card_by_url(new_card_url)
+
+    print(testcard)
+    # print(testcard.pretty_xml())
 
 if __name__ == "__main__":
     main()
