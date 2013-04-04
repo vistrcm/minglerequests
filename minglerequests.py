@@ -123,30 +123,6 @@ def get_cred():
     return (username, password)
 
 
-class Test(object):
-    """docstring for Test"""
-
-    def __init__(self, arg):
-        super(Test, self).__init__()
-        self._arg = arg
-
-    def foo():
-        doc = "The foo property."
-
-        def fget(self):
-            return self._foo
-
-        def fset(self, value):
-            logging.debug("new project is {}".format(value))
-            self._foo = value
-            self._arg = self._arg + self._foo
-
-        def fdel(self):
-            del self._foo
-        return locals()
-    foo = property(**foo())
-
-
 def main():
     """start programm"""
     username, password = get_cred()
