@@ -8,6 +8,7 @@ import os
 import getpass
 import ConfigParser
 from lxml import etree
+from urllib import urlencode
 
 SERVER = 'http://mingle'
 API_PATH = '/api/'
@@ -100,6 +101,22 @@ class Mingle(object):
 
         return Card(self, request.text)
 
+    def create_story(self, name):
+        """Create card"""
+        url = "{url}/cards.xml".format(url=self.url)
+
+        headers = {'content-type': 'application/x-www-form-urlencoded'}
+        payload = {'card[name]': name, 'card[card_type_name]': 'story'}
+
+        logging.debug("POSTing url {}".format(url))
+        request = self._session.post(
+            url,
+            data=urlencode(payload),
+            headers=headers,
+            auth=(self.user, self.password))
+
+        return request.headers['location']
+
 
 def get_cred():
     """Get credentials from file or user.
@@ -133,6 +150,7 @@ def main():
 
     card = mingle.card(889)
     print(card)
+    print(card.pretty_xml())
 
 if __name__ == "__main__":
     main()
