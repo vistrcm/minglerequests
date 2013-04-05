@@ -20,7 +20,10 @@ URL = '{server}{api_path}{api_ver}'.format(
 )
 CONFIG_FILE = os.path.expanduser("~/.mingle_requests")
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    filename='minglerequests.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 # logging.basicConfig(level=logging.INFO)
 
 
