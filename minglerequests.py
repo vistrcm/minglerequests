@@ -7,8 +7,8 @@ import logging
 import os
 import getpass
 import ConfigParser
+import xmlhelper
 from lxml import etree
-from urllib import urlencode
 
 SERVER = 'http://mingle'
 API_PATH = '/api/'
@@ -111,25 +111,20 @@ class Mingle(object):
         return self.card_by_url(url)
 
     def create_story(self, name):
-        """Create card"""
+        """create card using xml"""
         url = "{url}/cards.xml".format(url=self.url)
-
-        headers = {'content-type': 'application/x-www-form-urlencoded'}
-        payload = {
-            'card[name]': name,
-            'card[card_type_name]': 'story',
-            'card[properties][1][name]': 'Author',
-            'card[properties][1][value]': 'svitko',
-            'card[properties][2][name]': 'Iteration - Scheduled',
-            'card[properties][2][value]': '(Current Iteration)',
-        }
-
         logging.debug("POSTing url {}".format(url))
+        headers = {'content-type': 'application/xml'}
+
+        payload = xmlhelper.prepare_card_xml(name)
+        logging.debug("xml for card: \n{}".format(payload))
+
         request = self._session.post(
             url,
-            data=urlencode(payload),
             headers=headers,
+            data=payload,
             auth=(self.user, self.password))
+
         logging.debug("request data: {}".format(request.text))
         return request.headers['location']
 
@@ -164,16 +159,24 @@ def main():
     mingle.project = "devops"
     logging.debug("project is {}".format(mingle.project))
 
-    jira_id = 'WDSDO-3775'
-    jira_name = 'create document which describes DB pool service'
+    # card = mingle.card(889)
+    # print(card)
+    # logging.info("card: {}".format(card))
+
+    # logging.debug("card_xml: \n{}".format(card.pretty_xml()))
+
+    jira_id = 'WDSDO-3524'
+    jira_name = 'LDAP auth at C4D nodes works unstable'
 
     new_card_url = mingle.create_story("{jira_id} - {jira_name}".format(
         jira_id=jira_id,
         jira_name=jira_name))
+    logging.info("new card url: {}".format(new_card_url))
 
     testcard = mingle.card_by_url(new_card_url)
 
     print(testcard)
+    logging.info("created: {}".format(testcard))
     # print(testcard.pretty_xml())
 
 if __name__ == "__main__":
