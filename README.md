@@ -9,6 +9,8 @@ Requirements
 * [requests](python-requests.org)
 * lxml
 
+You can find all python requirements in requirements.txt
+
 Config
 ------
 By default config file contains user credentials. ~/.mingle_requests
