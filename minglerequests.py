@@ -1,12 +1,11 @@
 #!/sbin/venv python
 
 
-from __future__ import print_function, absolute_import, division
 import requests
 import logging
 import os
 import getpass
-import ConfigParser
+import configparser
 import xmlhelper
 from lxml import etree
 
@@ -137,15 +136,15 @@ def get_cred():
     # first try to parse config file
     try:
         logging.debug("getting info from {}".format(CONFIG_FILE))
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
         username = config.get(SERVER, "username")
         password = config.get(SERVER, "password")
-    except Exception, e:
+    except Exception as e:
         print("exception on getting data from config: %s" % e)
         print("asking user")
         # get auth info from user
-        username = raw_input('input username: ')
+        username = input('input username: ')
         password = getpass.getpass(prompt='input password: ')
 
     return (username, password)
@@ -165,8 +164,8 @@ def main():
 
     # logging.debug("card_xml: \n{}".format(card.pretty_xml()))
 
-    jira_id = 'WDSDO-3524'
-    jira_name = 'LDAP auth at C4D nodes works unstable'
+    jira_id = 'WDSDO-3224'
+    jira_name = 'Please create dedicated database and SDP instance for WSSG CI'
 
     new_card_url = mingle.create_story("{jira_id} - {jira_name}".format(
         jira_id=jira_id,
