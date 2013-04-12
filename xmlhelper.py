@@ -1,7 +1,9 @@
 from lxml import etree
+import base64
+import logging
 
 
-def prepare_card_xml(name, description=None):
+def prepare_card_xml(name, description=None, properties=None):
     """prepare xml for adding card"""
 
     def add_propertie(root, name, value):
@@ -12,7 +14,7 @@ def prepare_card_xml(name, description=None):
         br_name = etree.SubElement(branch, "name")
         br_name.text = name
         br_value = etree.SubElement(branch, "value")
-        br_value.text = value
+        br_value.text = str(value)
 
     card = etree.Element('card')
 
@@ -26,11 +28,12 @@ def prepare_card_xml(name, description=None):
     card_type = etree.SubElement(card, "card_type_name")
     card_type.text = "story"
 
-    card_properties = etree.SubElement(card, "properties", type="array")
+    if properties is not None:
+        card_properties = etree.SubElement(card, "properties", type="array")
 
-    add_propertie(card_properties, 'Author', 'svitko')
-    add_propertie(card_properties,
-                  'Iteration - Scheduled',
-                  '(Current Iteration)')
+        for name, value in properties.items():
+            logging.debug("adding property {}={} to card {}".format(
+                name, value, card_name))
+            add_propertie(card_properties, name, value)
 
-    return etree.tostring(card, pretty_print=True, encoding='UTF-8')
+    return etree.tounicode(card, pretty_print=True)
