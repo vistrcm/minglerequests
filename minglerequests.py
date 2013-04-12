@@ -109,13 +109,15 @@ class Mingle(object):
 
         return self.card_by_url(url)
 
-    def create_story(self, name):
+    def create_story(self, name, card_properties=None):
         """create card using xml"""
         url = "{url}/cards.xml".format(url=self.url)
         logging.debug("POSTing url {}".format(url))
         headers = {'content-type': 'application/xml'}
 
-        payload = xmlhelper.prepare_card_xml(name)
+        payload = xmlhelper.prepare_card_xml(
+            name,
+            properties=card_properties)
         logging.debug("xml for card: \n{}".format(payload))
 
         request = self._session.post(
@@ -164,12 +166,24 @@ def main():
 
     # logging.debug("card_xml: \n{}".format(card.pretty_xml()))
 
-    jira_id = 'WDSDO-3224'
-    jira_name = 'Please create dedicated database and SDP instance for WSSG CI'
+    jira_id = 'WDSDO-3861'
+    jira_name = 'Deploy StoreBoard services simulator on CI'
 
-    new_card_url = mingle.create_story("{jira_id} - {jira_name}".format(
-        jira_id=jira_id,
-        jira_name=jira_name))
+    card_properties = {
+        'Author': 'svitko',
+        'Iteration - Scheduled': '(Current Iteration)',
+        'Status': 'Ready to be Played',
+        'Story Tree - Project': 606,
+        'Estimate': 3
+    }
+
+    new_card_url = mingle.create_story(
+        "{jira_id} - {jira_name}".format(
+            jira_id=jira_id,
+            jira_name=jira_name
+        ),
+        card_properties=card_properties
+    )
     logging.info("new card url: {}".format(new_card_url))
 
     testcard = mingle.card_by_url(new_card_url)
