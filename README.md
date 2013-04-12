@@ -5,6 +5,7 @@ lib to make api requests to mingle
 
 Requirements
 ------------
+Python3.
 
 * [requests](python-requests.org)
 * lxml
