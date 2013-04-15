@@ -7,6 +7,7 @@ import os
 import getpass
 import configparser
 import xmlhelper
+import filehelper
 from lxml import etree
 
 SERVER = 'http://mingle'
@@ -18,6 +19,7 @@ URL = '{server}{api_path}{api_ver}'.format(
     api_ver=API_VER
 )
 CONFIG_FILE = os.path.expanduser("~/.mingle_requests")
+TICKETS_FILE = 'tickets.csv'
 
 logging.basicConfig(
     filename='minglerequests.log',
@@ -160,37 +162,28 @@ def main():
     mingle.project = "devops"
     logging.debug("project is {}".format(mingle.project))
 
-    # card = mingle.card(889)
-    # print(card)
-    # logging.info("card: {}".format(card))
+    tickets_to_create = filehelper.tickets_from_file(TICKETS_FILE)
 
-    # logging.debug("card_xml: \n{}".format(card.pretty_xml()))
+    for ticket in tickets_to_create:
+        jira_id = ticket['jira_id']
+        jira_name = ticket['jira_name']
 
-    jira_id = 'WDSDO-3861'
-    jira_name = 'Deploy StoreBoard services simulator on CI'
+        card_properties = ticket['properties']
 
-    card_properties = {
-        'Author': 'svitko',
-        'Iteration - Scheduled': '(Current Iteration)',
-        'Status': 'Ready to be Played',
-        'Story Tree - Project': 606,
-        'Estimate': 3
-    }
+        new_card_url = mingle.create_story(
+            "{jira_id} - {jira_name}".format(
+                jira_id=jira_id,
+                jira_name=jira_name
+            ),
+            card_properties=card_properties
+        )
+        logging.info("new card url: {}".format(new_card_url))
 
-    new_card_url = mingle.create_story(
-        "{jira_id} - {jira_name}".format(
-            jira_id=jira_id,
-            jira_name=jira_name
-        ),
-        card_properties=card_properties
-    )
-    logging.info("new card url: {}".format(new_card_url))
+        testcard = mingle.card_by_url(new_card_url)
 
-    testcard = mingle.card_by_url(new_card_url)
+        print(testcard)
+        logging.info("created: {}".format(testcard))
 
-    print(testcard)
-    logging.info("created: {}".format(testcard))
-    # print(testcard.pretty_xml())
 
 if __name__ == "__main__":
     main()
